@@ -42,4 +42,4 @@ RUN adduser --disabled-password --gecos "" django-user && \
 USER django-user
 
 # Runs migrations, collects static files, and starts Gunicorn on Render's assigned $PORT
-CMD ["sh", "-c", "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120 myproject.wsgi:application"]
+CMD ["sh", "-c", "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120 config.wsgi:application"]
