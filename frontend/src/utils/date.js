@@ -1,0 +1,1 @@
+export const getNormalizedDate = (date) => new Date(date).toLocaleString('en-PH');
