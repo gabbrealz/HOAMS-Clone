@@ -56,15 +56,15 @@ class LoginView(APIView):
             "message": "Login successful"
         })
 
-        is_prod = not settings.DEBUG
+        is_https = request.is_secure() or request.headers.get("X-Forwarded-Proto") == "https"
 
         # 4. Set HttpOnly cookie
         response.set_cookie(
             key="auth_token",
             value=token.key,
             httponly=True,                          # Prevents JavaScript reading (XSS protection)
-            secure=is_prod,                         # HTTPS only in production
-            samesite="None" if is_prod else "Lax",  # Prevents CSRF on cross-site requests
+            secure=is_https,                        # HTTPS only in production
+            samesite="None" if is_https else "Lax", # Prevents CSRF on cross-site requests
             max_age=60 * 60 * 24 * 7,               # Cookie lifetime in seconds (7 days)
         )
         return response
