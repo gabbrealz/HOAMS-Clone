@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Home, Bell, CheckCircle2 } from "lucide-react";
 import Sidebar from "../../components/resident/sidebar";
 import { usePageTitle } from "../../hooks/pageTitle";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const ANNOUNCEMENTS = [
   {
@@ -290,7 +291,7 @@ function ConcernsCard() {
 
 export default function ResidentDashboard() {
   usePageTitle("Resident");
-
+  const { user } = useAuth();
   const [active, setActive] = useState("dashboard");
 
   return (
@@ -313,7 +314,7 @@ export default function ResidentDashboard() {
           }}
           className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6"
         >
-          <Header residentName="Resident" />
+          <Header residentName={user.first_name} />
 
           <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
             <div className="min-w-0 lg:col-span-2">

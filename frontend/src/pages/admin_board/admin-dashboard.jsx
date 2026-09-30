@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Home, Bell, CheckCircle2 } from "lucide-react";
 import Sidebar from "../../components/admin_board/sidebar-admin";
 import { usePageTitle } from "../../hooks/pageTitle";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const ANNOUNCEMENTS = [
   {
@@ -100,7 +101,7 @@ function Header({ adminName = "Admin" }) {
     <header className="flex items-center justify-between gap-4">
       <div className="flex min-w-0 items-center gap-4">
         <img
-          src="/public/assets/profile.jpg"
+          src="/assets/profile.jpg"
           alt={`${adminName}'s profile`}
           className="h-16 w-16 shrink-0 rounded-full border-2 border-[#B69A00] object-cover sm:h-20 sm:w-20"
         />
@@ -299,6 +300,7 @@ function ConcernsCard() {
 
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   usePageTitle("Admin");
 
   const [active, setActive] = useState("dashboard");
@@ -308,7 +310,7 @@ export default function AdminDashboard() {
       className="min-h-screen w-full bg-cover bg-center bg-fixed p-3 sm:p-4"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(23, 24, 74, 0.72), rgba(23, 24, 74, 0.72)), url('/public/assets/magallanes-village.jpg')",
+          "linear-gradient(rgba(23, 24, 74, 0.72), rgba(23, 24, 74, 0.72)), url('/assets/magallanes-village.jpg')",
       }}
     >
       <div className="flex gap-3 sm:gap-4">
@@ -322,7 +324,7 @@ export default function AdminDashboard() {
           ease: "easeOut",
         }}
         className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
-          <Header residentName="Admin" />
+          <Header residentName={user.first_name} />
 
           <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
             <div className="min-w-0 lg:col-span-2">

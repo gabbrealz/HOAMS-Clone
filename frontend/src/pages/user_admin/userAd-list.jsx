@@ -19,6 +19,7 @@ import {
 import Sidebar from "../../components/user_admin/sidebar-user";
 import { usePageTitle } from "../../hooks/pageTitle";
 import { listUsers, updateRole } from "../../api/users";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const AVATAR_COLORS = ["#2E3192", "#B69A00", "#4B4FC4"];
 
@@ -914,6 +915,7 @@ function ResidentsPanel() {
 }
 
 export default function ResidentsListPage_User() {
+  const { user } = useAuth();
   usePageTitle("Admin");
 
   return (
@@ -933,7 +935,7 @@ export default function ResidentsListPage_User() {
           transition={{ duration: 0.25, ease: "easeOut" }}
           className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6"
         >
-          <Header adminName="Admin" />
+          <Header adminName={user.first_name} />
           <ResidentsPanel />
         </motion.main>
       </div>
