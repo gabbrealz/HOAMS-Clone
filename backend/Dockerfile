@@ -1,7 +1,7 @@
 # ==========================================
 # 1. Build Stage
 # ==========================================
-FROM python:3.11-slim AS builder
+FROM python:3.12-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -21,7 +21,7 @@ RUN pip install --upgrade pip && \
 # ==========================================
 # 2. Runtime Stage
 # ==========================================
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
