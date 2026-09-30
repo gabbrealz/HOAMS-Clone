@@ -74,12 +74,24 @@ class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        # 1. Delete token from database
-        request.user.auth_token.delete()
+        # 1. Safely delete token from database (prevents AttributeError if token is missing)
+        if hasattr(request.user, "auth_token"):
+            request.user.auth_token.delete()
 
-        # 2. Remove cookie from browser
+        # 2. Instantiate response FIRST
         response = Response({"message": "Logout successful"})
-        response.delete_cookie("auth_token")
+
+        is_https = request.is_secure() or request.headers.get("X-Forwarded-Proto") == "https"
+
+        # 3. Attach delete_cookie to the response instance
+        response.delete_cookie(
+            key="auth_token",
+            samesite="None" if is_https else "Lax",
+            secure=is_https,
+            httponly=True,
+            path="/",  # Ensures cookie is cleared across all endpoints
+        )
+
         return response
 
 
