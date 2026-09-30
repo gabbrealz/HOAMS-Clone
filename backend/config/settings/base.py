@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-@ijp19p8=#7vyzau#qfxvl=vwr(09$z#01xo@i%rfj$n#dkqbl
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "https://mva-hoams.onrender.com",
+    "mva-hoams.onrender.com",
     "localhost",
     "127.0.0.1",
 ]
@@ -113,8 +113,6 @@ CSRF_COOKIE_SECURE = True
 FRONTEND_URL = config("FRONTEND_URL", default="")
 if FRONTEND_URL:
     clean_url = FRONTEND_URL.rstrip("/")
-    if clean_url not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(clean_url)
     if clean_url not in CORS_ALLOWED_ORIGINS:
         CORS_ALLOWED_ORIGINS.append(clean_url)
     if clean_url not in CSRF_TRUSTED_ORIGINS:
