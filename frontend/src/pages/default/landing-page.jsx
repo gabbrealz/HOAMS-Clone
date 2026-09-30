@@ -290,7 +290,7 @@ function Navbar() {
 
   return (
     <SiteHeader
-      logoImage="/public/assets/logo_1.png"
+      logoImage="/assets/logo_1.png"
       below={mobilePanel}
     >
       <nav className="hidden items-center gap-7 md:flex">
@@ -328,7 +328,7 @@ function Hero() {
         className="absolute inset-0 scale-105 bg-cover bg-center blur-sm"
         style={{
           backgroundImage:
-            "url('/public/assets/magallanes-village.jpg')",
+            "url('/assets/magallanes-village.jpg')",
         }}
       />
 

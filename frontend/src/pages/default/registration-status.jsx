@@ -69,7 +69,7 @@ export default function RegistrationStatus() {
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden px-6 py-12">
       <div
         className="absolute inset-0 scale-105 bg-cover bg-center blur-sm"
-        style={{ backgroundImage: "url('/public/assets/magallanes-village.jpg')" }}
+        style={{ backgroundImage: "url('/assets/magallanes-village.jpg')" }}
       />
       <div className="absolute inset-0 bg-[#17184A]/70" />
       <div className="absolute inset-0 bg-gradient-to-br from-[#1F2266]/70 via-[#2E3192]/50 to-[#4B4FC4]/40" />
@@ -90,7 +90,7 @@ export default function RegistrationStatus() {
           <div className="mb-8 flex flex-col items-center text-center">
             <div className="mb-4 h-12 w-auto">
               <img
-                src="/public/assets/logo_1.png"
+                src="/assets/logo_1.png"
                 alt="HOAMS Logo"
                 className="h-full w-auto object-contain"
               />

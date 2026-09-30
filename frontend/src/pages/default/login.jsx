@@ -37,7 +37,7 @@ export default function LoginPage() {
       <div
         className="absolute inset-0 bg-cover bg-center scale-105 blur-sm"
         style={{
-          backgroundImage: "url('/public/assets/magallanes-village.jpg')",
+          backgroundImage: "url('/assets/magallanes-village.jpg')",
         }}
       />
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
             {}
             <div className="mb-4 h-12 w-auto">
               <img
-                src="/public/assets/logo_1.png"
+                src="/assets/logo_1.png"
                 alt="HOAMS Logo"
                 className="h-full w-auto object-contain"
               />

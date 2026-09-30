@@ -61,7 +61,7 @@ function RegisterHeader({ current }) {
     <div className="mb-10 flex flex-col items-center text-center">
       <div className="mb-4 h-12 w-auto">
         <img
-          src="/public/assets/logo_1.png"
+          src="/assets/logo_1.png"
           alt="HOAMS Logo"
           className="h-full w-auto object-contain"
         />
@@ -580,7 +580,7 @@ export default function RegisterFlow() {
       <div
         className="absolute inset-0 scale-105 bg-cover bg-center blur-sm"
         style={{
-          backgroundImage: "url('/public/assets/magallanes-village.jpg')",
+          backgroundImage: "url('/assets/magallanes-village.jpg')",
         }}
       />
 

@@ -98,7 +98,7 @@ function Header({ residentName = "Resident" }) {
     <header className="flex items-center justify-between gap-4">
       <div className="flex min-w-0 items-center gap-4">
         <img
-          src="/public/assets/profile.jpg"
+          src="/assets/profile.jpg"
           alt={`${residentName}'s profile`}
           className="h-16 w-16 shrink-0 rounded-full border-2 border-[#B69A00] object-cover sm:h-20 sm:w-20"
         />
@@ -298,7 +298,7 @@ export default function ResidentDashboard() {
       className="min-h-screen w-full bg-cover bg-center bg-fixed p-3 sm:p-4"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(23, 24, 74, 0.72), rgba(23, 24, 74, 0.72)), url('/public/assets/magallanes-village.jpg')",
+          "linear-gradient(rgba(23, 24, 74, 0.72), rgba(23, 24, 74, 0.72)), url('/assets/magallanes-village.jpg')",
       }}
     >
       <div className="flex gap-3 sm:gap-4">
