@@ -577,7 +577,6 @@ function ResidentsPanel() {
                     );
                   })}
                 </tbody>
-              )}
             </table>
           </div>
 
