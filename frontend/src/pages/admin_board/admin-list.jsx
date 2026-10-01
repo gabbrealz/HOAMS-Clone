@@ -95,6 +95,7 @@ function ResidentsPanel() {
   const [residents, setResidents] = useState([]);
   const [pendingResidents, setPendingResidents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [activeTab, setActiveTab] = useState("residents");
   const [selected, setSelected] = useState([]);
@@ -140,26 +141,14 @@ function ResidentsPanel() {
     phone: "",
   });
 
-  const currentData =
-  activeTab === "pending" ? pendingResidents : residents;
-
+  const currentData = activeTab === "pending" ? pendingResidents : residents;
   const ROWS_PER_PAGE = 10;
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(currentData.length / ROWS_PER_PAGE)
-  );
-
-  const paginatedData = currentData.slice(
-    (page - 1) * ROWS_PER_PAGE,
-    page * ROWS_PER_PAGE
-  );
+  const totalPages = Math.max(1, Math.ceil(currentData.length / ROWS_PER_PAGE));
+  const paginatedData = currentData.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
 
   const allSelected =
     paginatedData.length > 0 &&
-    paginatedData.every((resident) =>
-      selected.includes(resident.id)
-    );
+    paginatedData.every((resident) => selected.includes(resident.id));
 
   const toggleAll = () => {
     const pageIds = paginatedData.map((resident) => resident.id);
@@ -177,27 +166,34 @@ function ResidentsPanel() {
     );
   };
 
-  const acceptResident = () => {
+  const acceptResident = async () => {
     if (!reviewingResident) return;
 
-    approveApplication(reviewingResident.id);
+    setIsSubmitting(true);
+    try {
+      await approveApplication(reviewingResident.id);
 
-    setResidents((prev) => [
-      ...prev,
-      {
-        ...reviewingResident,
-        roles: reviewingResident.roles || ["resident"],
-      },
-    ]);
+      setResidents((prev) => [
+        ...prev,
+        {
+          ...reviewingResident,
+          roles: reviewingResident.roles || ["resident"],
+        },
+      ]);
 
-    setPendingResidents((prev) =>
-      prev.filter((resident) => resident.id !== reviewingResident.id)
-    );
+      setPendingResidents((prev) =>
+        prev.filter((resident) => resident.id !== reviewingResident.id)
+      );
 
-    setSelected((prev) => prev.filter((id) => id !== reviewingResident.id));
+      setSelected((prev) => prev.filter((id) => id !== reviewingResident.id));
 
-    setReviewingResident(null);
-    setViewingImage(false);
+      setReviewingResident(null);
+      setViewingImage(false);
+    } catch (error) {
+      console.error("Failed to approve application:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const openRejectModal = () => {
@@ -222,17 +218,24 @@ function ResidentsPanel() {
       return;
     }
 
-    await rejectApplication(reviewingResident.id, remark);
+    setIsSubmitting(true);
+    try {
+      await rejectApplication(reviewingResident.id, remark);
 
-    setPendingResidents((prev) =>
-      prev.filter((resident) => resident.id !== reviewingResident.id)
-    );
+      setPendingResidents((prev) =>
+        prev.filter((resident) => resident.id !== reviewingResident.id)
+      );
 
-    setSelected((prev) => prev.filter((id) => id !== reviewingResident.id));
+      setSelected((prev) => prev.filter((id) => id !== reviewingResident.id));
 
-    closeRejectModal();
-    setReviewingResident(null);
-    setViewingImage(false);
+      closeRejectModal();
+      setReviewingResident(null);
+      setViewingImage(false);
+    } catch (error) {
+      console.error("Failed to reject application:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -447,9 +450,12 @@ function ResidentsPanel() {
                 </tr>
               </thead>
 
-              <tbody>
-                {paginatedData.map((resident, i) => {
-                  const isSelected = selected.includes(resident.id);
+              {loading ? (
+                <TableSkeleton columnsCount={9} rowsCount={5} />
+              ) : (
+                <tbody>
+                  {paginatedData.map((resident, i) => {
+                    const isSelected = selected.includes(resident.id);
 
                     return (
                       <tr
@@ -489,8 +495,7 @@ function ResidentsPanel() {
                               </span>
 
                               <span className="text-[10px] text-gray-400">
-                                {resident.first_name}{" "}
-                                {resident.middle_initial}{" "}
+                                {resident.first_name} {resident.middle_initial}{" "}
                                 {resident.last_name}
                               </span>
                             </div>
@@ -577,6 +582,7 @@ function ResidentsPanel() {
                     );
                   })}
                 </tbody>
+              )}
             </table>
           </div>
 
@@ -598,9 +604,7 @@ function ResidentsPanel() {
                 type="button"
                 aria-label="Previous page"
                 disabled={page === 1}
-                onClick={() =>
-                  setPage((p) => Math.max(1, p - 1))
-                }
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                   page === 1
                     ? "cursor-not-allowed text-gray-300"
@@ -610,30 +614,26 @@ function ResidentsPanel() {
                 <ChevronLeft size={16} />
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (n) => (
-                  <button
-                    type="button"
-                    key={n}
-                    onClick={() => setPage(n)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
-                      page === n
-                        ? "bg-[#2E3192] text-white"
-                        : "text-gray-500 hover:bg-white"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                )
-              )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  type="button"
+                  key={n}
+                  onClick={() => setPage(n)}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
+                    page === n
+                      ? "bg-[#2E3192] text-white"
+                      : "text-gray-500 hover:bg-white"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
 
               <button
                 type="button"
                 aria-label="Next page"
                 disabled={page === totalPages}
-                onClick={() =>
-                  setPage((p) => Math.min(totalPages, p + 1))
-                }
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                   page === totalPages
                     ? "cursor-not-allowed text-gray-300"
@@ -683,9 +683,7 @@ function ResidentsPanel() {
                 className="flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold text-white"
                 style={{
                   backgroundColor:
-                    AVATAR_COLORS[
-                      reviewingResident.id % AVATAR_COLORS.length
-                    ],
+                    AVATAR_COLORS[reviewingResident.id % AVATAR_COLORS.length],
                 }}
               >
                 {initials(reviewingResident)}
@@ -812,7 +810,8 @@ function ResidentsPanel() {
                   setReviewingResident(null);
                   setViewingImage(false);
                 }}
-                className="rounded-full bg-[#F1F2F6] px-5 py-2.5 text-xs font-medium text-gray-600 transition-colors hover:bg-[#E5E6EC]"
+                disabled={isSubmitting}
+                className="rounded-full bg-[#F1F2F6] px-5 py-2.5 text-xs font-medium text-gray-600 transition-colors hover:bg-[#E5E6EC] disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -820,7 +819,8 @@ function ResidentsPanel() {
               <button
                 type="button"
                 onClick={openRejectModal}
-                className="flex items-center justify-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-5 py-2.5 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-100"
+                disabled={isSubmitting}
+                className="flex items-center justify-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-5 py-2.5 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-100 disabled:opacity-50"
               >
                 <X size={14} />
                 Reject
@@ -829,10 +829,15 @@ function ResidentsPanel() {
               <button
                 type="button"
                 onClick={acceptResident}
-                className="flex items-center justify-center gap-1.5 rounded-full bg-[#2E3192] px-5 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#252878]"
+                disabled={isSubmitting}
+                className="flex items-center justify-center gap-1.5 rounded-full bg-[#2E3192] px-5 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#252878] disabled:opacity-50"
               >
-                <Check size={14} />
-                Accept
+                {isSubmitting ? (
+                  <Loader2 className="animate-spin" size={14} />
+                ) : (
+                  <Check size={14} />
+                )}
+                {isSubmitting ? "Accepting..." : "Accept"}
               </button>
             </div>
           </div>
@@ -895,7 +900,8 @@ function ResidentsPanel() {
                 <button
                   type="button"
                   onClick={closeRejectModal}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                  disabled={isSubmitting}
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
                 >
                   <X size={18} />
                 </button>
@@ -911,6 +917,7 @@ function ResidentsPanel() {
                   setRejectRemark(e.target.value);
                   if (rejectError) setRejectError(false);
                 }}
+                disabled={isSubmitting}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -920,7 +927,7 @@ function ResidentsPanel() {
                 rows={4}
                 maxLength={300}
                 placeholder="e.g. The submitted ID is unclear or does not match the provided details."
-                className={`mt-1 w-full resize-none rounded-xl border bg-[#F8F9FC] px-3 py-2.5 text-sm text-[#1A1A2E] outline-none transition focus:ring-2 ${
+                className={`mt-1 w-full resize-none rounded-xl border bg-[#F8F9FC] px-3 py-2.5 text-sm text-[#1A1A2E] outline-none transition focus:ring-2 disabled:opacity-50 ${
                   rejectError
                     ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500/10"
                     : "border-[#D6D8E5] focus:border-[#2E3192] focus:ring-[#2E3192]/10"
@@ -941,7 +948,8 @@ function ResidentsPanel() {
                 <button
                   type="button"
                   onClick={closeRejectModal}
-                  className="rounded-full bg-[#F1F2F6] px-5 py-2.5 text-xs font-medium text-gray-600 transition-colors hover:bg-[#E5E6EC]"
+                  disabled={isSubmitting}
+                  className="rounded-full bg-[#F1F2F6] px-5 py-2.5 text-xs font-medium text-gray-600 transition-colors hover:bg-[#E5E6EC] disabled:opacity-50"
                 >
                   Back
                 </button>
@@ -949,10 +957,15 @@ function ResidentsPanel() {
                 <button
                   type="button"
                   onClick={rejectResident}
-                  className="flex items-center justify-center gap-1.5 rounded-full bg-rose-600 px-5 py-2.5 text-xs font-medium text-white transition-colors hover:bg-rose-700"
+                  disabled={isSubmitting}
+                  className="flex items-center justify-center gap-1.5 rounded-full bg-rose-600 px-5 py-2.5 text-xs font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
                 >
-                  <X size={14} />
-                  Confirm Reject
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin" size={14} />
+                  ) : (
+                    <X size={14} />
+                  )}
+                  {isSubmitting ? "Rejecting..." : "Confirm Reject"}
                 </button>
               </div>
             </motion.div>
@@ -1061,9 +1074,7 @@ function ResidentsPanel() {
                   <input
                     type="email"
                     value={editForm.email}
-                    onChange={(e) =>
-                      handleEditChange("email", e.target.value)
-                    }
+                    onChange={(e) => handleEditChange("email", e.target.value)}
                     className="mt-1 w-full rounded-xl border border-[#D6D8E5] bg-[#F8F9FC] px-3 py-2.5 text-sm text-[#1A1A2E] outline-none transition focus:border-[#2E3192] focus:ring-2 focus:ring-[#2E3192]/10"
                   />
                 </div>
@@ -1103,9 +1114,7 @@ function ResidentsPanel() {
 
                   <input
                     value={editForm.phone}
-                    onChange={(e) =>
-                      handleEditChange("phone", e.target.value)
-                    }
+                    onChange={(e) => handleEditChange("phone", e.target.value)}
                     className="mt-1 w-full rounded-xl border border-[#D6D8E5] bg-[#F8F9FC] px-3 py-2.5 text-sm text-[#1A1A2E] outline-none transition focus:border-[#2E3192] focus:ring-2 focus:ring-[#2E3192]/10"
                   />
                 </div>
@@ -1212,8 +1221,8 @@ function ResidentsPanel() {
               </div>
 
               <p className="mt-4 text-xs leading-5 text-gray-500">
-                Are you sure you want to delete this account? The resident
-                will be removed from the registered residents list.
+                Are you sure you want to delete this account? The resident will
+                be removed from the registered residents list.
               </p>
 
               <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

@@ -324,7 +324,7 @@ export default function AdminDashboard() {
           ease: "easeOut",
         }}
         className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
-          <Header residentName={user.first_name} />
+          <Header adminName={user.first_name} />
 
           <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
             <div className="min-w-0 lg:col-span-2">
