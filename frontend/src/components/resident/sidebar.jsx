@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../../context/AuthContext.jsx";
 
 export const DEFAULT_NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutGrid, path: "/resident-dashboard" },
+  { id: "dashboard", label: "Dashboard", icon: LayoutGrid, path: "/resident/dashboard" },
   { id: "concerns", label: "Concerns", icon: MessageSquareWarning, path: "#" },
   { id: "announcement", label: "Announcements", icon: IdCard, path: "#" },
   { id: "units", label: "My Units", icon: Home, path: "#" },
