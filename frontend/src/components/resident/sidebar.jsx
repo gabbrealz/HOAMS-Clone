@@ -37,24 +37,14 @@ function SidebarButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-export default function Sidebar({
-  items = DEFAULT_NAV_ITEMS,
-  active: activeProp,
-  onChange,
-}) {
-  const [internalActive, setInternalActive] = useState(items[0]?.id ?? "dashboard");
-  const isControlled = activeProp !== undefined;
-  const active = isControlled ? activeProp : internalActive;
+export default function Sidebar({ items = DEFAULT_NAV_ITEMS }) {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { handleLogout } = useAuth();
 
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(`${path}/`);
-
-  const setActive = (id) => {
-    if (!isControlled) setInternalActive(id);
-    onChange?.(id);
-  };
 
   return (
     <aside
@@ -103,7 +93,7 @@ export default function Sidebar({
         <SidebarButton
           icon={LogOut}
           label="Log out"
-          active={active === "logout"}
+          active={false}
           onClick={handleLogout}
         />
 

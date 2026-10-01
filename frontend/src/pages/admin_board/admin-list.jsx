@@ -140,14 +140,34 @@ function ResidentsPanel() {
     phone: "",
   });
 
-  const currentData = activeTab === "pending" ? pendingResidents : residents;
+  const currentData =
+  activeTab === "pending" ? pendingResidents : residents;
+
+  const ROWS_PER_PAGE = 10;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(currentData.length / ROWS_PER_PAGE)
+  );
+
+  const paginatedData = currentData.slice(
+    (page - 1) * ROWS_PER_PAGE,
+    page * ROWS_PER_PAGE
+  );
 
   const allSelected =
-    currentData.length > 0 && selected.length === currentData.length;
+    paginatedData.length > 0 &&
+    paginatedData.every((resident) =>
+      selected.includes(resident.id)
+    );
 
   const toggleAll = () => {
-    setSelected(
-      allSelected ? [] : currentData.map((resident) => resident.id)
+    const pageIds = paginatedData.map((resident) => resident.id);
+
+    setSelected((prev) =>
+      allSelected
+        ? prev.filter((id) => !pageIds.includes(id))
+        : [...new Set([...prev, ...pageIds])]
     );
   };
 
@@ -427,12 +447,9 @@ function ResidentsPanel() {
                 </tr>
               </thead>
 
-              {loading ? (
-                <TableSkeleton columnsCount={columns.length} rowsCount={5} />
-              ) : (
-                <tbody>
-                  {currentData.map((resident, i) => {
-                    const isSelected = selected.includes(resident.id);
+              <tbody>
+                {paginatedData.map((resident, i) => {
+                  const isSelected = selected.includes(resident.id);
 
                     return (
                       <tr
@@ -581,58 +598,56 @@ function ResidentsPanel() {
               <button
                 type="button"
                 aria-label="Previous page"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-white"
+                disabled={page === 1}
+                onClick={() =>
+                  setPage((p) => Math.max(1, p - 1))
+                }
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  page === 1
+                    ? "cursor-not-allowed text-gray-300"
+                    : "text-gray-500 hover:bg-white"
+                }`}
               >
                 <ChevronLeft size={16} />
               </button>
 
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  type="button"
-                  key={n}
-                  onClick={() => setPage(n)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
-                    page === n
-                      ? "bg-[#2E3192] text-white"
-                      : "text-gray-500 hover:bg-white"
-                  }`}
-                >
-                  {n}
-                </button>
-              ))}
-
-              <span className="px-1 text-gray-400">&middot;&middot;&middot;</span>
-
-              <button
-                type="button"
-                onClick={() => setPage(100)}
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
-                  page === 100
-                    ? "bg-[#2E3192] text-white"
-                    : "text-gray-500 hover:bg-white"
-                }`}
-              >
-                100
-              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (n) => (
+                  <button
+                    type="button"
+                    key={n}
+                    onClick={() => setPage(n)}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
+                      page === n
+                        ? "bg-[#2E3192] text-white"
+                        : "text-gray-500 hover:bg-white"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                )
+              )}
 
               <button
                 type="button"
                 aria-label="Next page"
-                onClick={() => setPage((p) => Math.min(100, p + 1))}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-white"
+                disabled={page === totalPages}
+                onClick={() =>
+                  setPage((p) => Math.min(totalPages, p + 1))
+                }
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  page === totalPages
+                    ? "cursor-not-allowed text-gray-300"
+                    : "text-gray-500 hover:bg-white"
+                }`}
               >
                 <ChevronRight size={16} />
               </button>
             </div>
 
-            <button
-              type="button"
-              className="flex items-center justify-center gap-1.5 self-end rounded-full bg-white px-3.5 py-2 text-xs text-gray-500 shadow-sm hover:bg-gray-50 sm:self-auto"
-            >
+            <div className="flex items-center justify-center gap-1.5 self-end rounded-full bg-white px-3.5 py-2 text-xs text-gray-500 shadow-sm sm:self-auto">
               10 / page
-              <ChevronDown size={14} />
-            </button>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
