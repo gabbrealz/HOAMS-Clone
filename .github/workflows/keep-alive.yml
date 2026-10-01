@@ -1,0 +1,15 @@
+name: Keep Render Service Awake
+
+on:
+  schedule:
+    # Runs every 10 minutes (GitHub's minimum official evaluation is 5-10 mins)
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  ping-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send a GET request to Render URL
+        run: |
+          curl -s https://mva-hoams.onrender.com || echo "Ping failed but workflow succeeded"
